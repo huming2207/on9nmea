@@ -21,7 +21,8 @@ typedef enum on9_nmea_state : uint8_t {
 
 typedef enum on9_nmea_mode_indicator : uint8_t {
     ON9_NMEA_MODE_UNKNOWN = 0,
-    ON9_NMEA_MODE_AUTO = 'A',
+    ON9_NMEA_MODE_PPS_FIXED = 3,
+    ON9_NMEA_MODE_AUTO_FIXED = 'A',
     ON9_NMEA_MODE_DIFFERENTIAL = 'D',
     ON9_NMEA_MODE_ESTIMATED = 'E',
     ON9_NMEA_MODE_FLOAT_RTK = 'F',
@@ -42,17 +43,19 @@ typedef enum on9_nmea_nav_status : uint8_t {
 } on9_nmea_nav_status_t;
 
 typedef struct on9_nmea_time {
-    int8_t hour;
-    int8_t minute;
-    int8_t second;
-    int16_t sub_secs;
+    uint8_t hour;
+    uint8_t minute;
+    uint8_t second;
+    uint16_t sub_secs;
 } on9_nmea_time_t;
 
 typedef struct on9_nmea_date {
-    int8_t year;
-    int8_t month;
-    int8_t day;
+    uint8_t year;
+    uint8_t month;
+    uint8_t day;
 } on9_nmea_date_t;
+
+#define ON9_NMEA_COORD_MINOR_ACCURACY 1000000UL
 
 typedef struct on9_nmea_coord {
     int32_t major;
@@ -62,16 +65,20 @@ typedef struct on9_nmea_coord {
 typedef struct on9_gnss_result {
     bool valid;
     uint8_t sat_in_use;
+    on9_nmea_mode_indicator_t mode;
+    on9_nmea_nav_status_t nav_status;
     char talker[3];
+    on9_nmea_date_t date;
+    on9_nmea_time_t time;
     char type[4];
     on9_nmea_float_t latitude;
     on9_nmea_float_t longitude;
-    on9_nmea_float_t speed;
+    on9_nmea_float_t speed_knot;
+    on9_nmea_float_t hdop;
     on9_nmea_float_t tmg; // Track made good
-    on9_nmea_date_t date;
+    on9_nmea_float_t altitude;
+    on9_nmea_float_t geo_sep; // Geoidal separation
     on9_nmea_float_t mag_variation;
-    on9_nmea_mode_indicator_t mode;
-    on9_nmea_nav_status_t nav_status;
 } on9_nmea_result_t;
 
 typedef struct on9_nmea_ctx {
