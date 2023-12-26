@@ -27,7 +27,13 @@ static char *on9_strnstr(const char *str, const char *substring, size_t str_len)
         return (char *) str;
     }
 
+    size_t idx = 0;
     for ( ; *str != 0; str += 1) {
+        if (idx > str_len) {
+            return NULL;
+        }
+
+        idx += 1;
         if (*str != *b) {
             continue;
         }
@@ -37,6 +43,7 @@ static char *on9_strnstr(const char *str, const char *substring, size_t str_len)
             if (*b == 0) {
                 return (char *) str;
             }
+
             if (*a++ != *b++) {
                 break;
             }
@@ -113,6 +120,7 @@ static on9_nmea_state_t parse_type(on9_nmea_ctx_t *ctx)
             ctx->next_result.type[2] = 'C';
             ctx->next_result.type[3] = '\0';
             return ctx->curr_state;
+            return ON9_NMEA_STATE_START_RMC;
         } else if (on9_strnstr(ctx->item_str, "GGA", ON9_ITEM_BUF_SIZE - 1) != NULL) {
             ctx->curr_state = ON9_NMEA_STATE_START_GGA;
             ctx->next_result.talker[0] = ctx->item_str[0];
@@ -124,6 +132,7 @@ static on9_nmea_state_t parse_type(on9_nmea_ctx_t *ctx)
             return ctx->curr_state;
         } else {
             ctx->item_pos += 1;
+            return ON9_NMEA_STATE_START_GGA;
         }
     } else {
         ctx->item_pos += 1;
@@ -340,6 +349,7 @@ on9_nmea_state_t on9_nmea_feed_char(on9_nmea_ctx_t *ctx, char next)
             ctx->curr_checksum ^= next;
             ctx->item_pos = 0;
             ctx->item_num += 1;
+            memset(ctx->item_str, 0, ON9_ITEM_BUF_SIZE);
             break;
         }
 

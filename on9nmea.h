@@ -3,9 +3,13 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define ON9_ITEM_BUF_SIZE 16UL
 
-typedef enum on9_nmea_state : uint8_t {
+typedef enum on9_nmea_state {
     ON9_NMEA_STATE_IDLE = 0,
     ON9_NMEA_STATE_START_UNDEFINED = 0x10,
     ON9_NMEA_STATE_START_RMC = 0x11,
@@ -18,7 +22,7 @@ typedef enum on9_nmea_state : uint8_t {
     ON9_NMEA_STATE_ERROR_NULLPTR = 0xFF,
 } on9_nmea_state_t;
 
-typedef enum on9_nmea_mode_indicator : uint8_t {
+typedef enum on9_nmea_mode_indicator {
     ON9_NMEA_MODE_UNKNOWN = 0,
     ON9_NMEA_MODE_PPS_FIXED = 3,
     ON9_NMEA_MODE_AUTO_FIXED = 'A',
@@ -33,7 +37,7 @@ typedef enum on9_nmea_mode_indicator : uint8_t {
     ON9_NMEA_MODE_INVALID = 'V',
 } on9_nmea_mode_indicator_t;
 
-typedef enum on9_nmea_nav_status : uint8_t {
+typedef enum on9_nmea_nav_status {
     ON9_NMEA_NAV_STATUS_UNKNOWN = 0,
     ON9_NMEA_NAV_STATUS_SAFE = 'S',
     ON9_NMEA_NAV_STATUS_CAUTION = 'C',
@@ -94,3 +98,7 @@ typedef struct on9_nmea_ctx {
 void on9_nmea_init(on9_nmea_ctx_t *ctx);
 on9_nmea_state_t on9_nmea_feed_char(on9_nmea_ctx_t *ctx, char next);
 on9_nmea_result_t *on9_nmea_get_result(on9_nmea_ctx_t *ctx);
+
+#ifdef __cplusplus
+}
+#endif
