@@ -289,7 +289,7 @@ static on9_nmea_state_t parse_gga(on9_nmea_ctx_t *ctx)
 
 static on9_nmea_state_t parse_checksum(on9_nmea_ctx_t *ctx)
 {
-    if (ctx->item_pos < 2) {
+    if (ctx->item_pos < 1) {
         return ctx->curr_state;
     }
 
@@ -335,6 +335,7 @@ on9_nmea_state_t on9_nmea_feed_char(on9_nmea_ctx_t *ctx, char next)
         case '*': {
             ctx->curr_state = ON9_NMEA_STATE_START_CHECKSUM;
             ctx->asterisk = true;
+            ctx->item_pos = 0;
             ctx->item_num += 1;
             break;
         }
@@ -360,7 +361,7 @@ on9_nmea_state_t on9_nmea_feed_char(on9_nmea_ctx_t *ctx, char next)
             }
 
             // Append char to buffer if this is a part of the NMEA segment
-            if ((ctx->curr_state & ON9_NMEA_STATE_START_UNDEFINED) != 0) {
+            if ((ctx->curr_state & ON9_NMEA_STATE_START_UNDEFINED) != 0 || (ctx->curr_state & ON9_NMEA_STATE_START_CHECKSUM) != 0) {
                 if (next >= 0x20 && next < 0x7f && next != '\n') {
                     ctx->item_str[ctx->item_pos] = next;
                     ctx->item_str[ON9_ITEM_BUF_SIZE - 1] = '\0';
