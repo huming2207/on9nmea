@@ -7,13 +7,12 @@
 
 typedef enum on9_nmea_state : uint8_t {
     ON9_NMEA_STATE_IDLE = 0,
-    ON9_NMEA_STATE_START_UNDEFINED = 1,
-    ON9_NMEA_STATE_START_RMC = 2,
-    ON9_NMEA_STATE_START_GGA = 3,
+    ON9_NMEA_STATE_START_UNDEFINED = 0x10,
+    ON9_NMEA_STATE_START_RMC = 0x11,
+    ON9_NMEA_STATE_START_GGA = 0x12,
     ON9_NMEA_STATE_START_CHECKSUM = 0x20,
-    ON9_NMEA_STATE_END_CHECKSUM = 0x21,
-    ON9_NMEA_STATE_DONE_RMC = 0x80,
-    ON9_NMEA_STATE_DONE_GGA = 0x81,
+    ON9_NMEA_STATE_END_CHECKSUM = 0x40,
+    ON9_NMEA_STATE_DONE = 0x80,
     ON9_NMEA_STATE_ERROR_CHECKSUM_FAIL = 0xF0,
     ON9_NMEA_STATE_ERROR_UNKNOWN_LINE = 0xF1,
     ON9_NMEA_STATE_ERROR_NULLPTR = 0xFF,
@@ -86,6 +85,7 @@ typedef struct on9_nmea_ctx {
     uint8_t item_num;
     uint8_t item_pos;
     uint8_t curr_checksum;
+    uint8_t expected_checksum;
     on9_nmea_state_t curr_state;
     on9_nmea_result_t next_result;
     char item_str[ON9_ITEM_BUF_SIZE];
