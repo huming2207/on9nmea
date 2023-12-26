@@ -72,19 +72,11 @@ static uint8_t on9_two_char_to_u8(const char *digits)
 
 static uint32_t on9_chars_to_u32(on9_nmea_ctx_t *ctx)
 {
-    size_t idx = 0;
     uint32_t ret = 0;
-    while (idx < ON9_ITEM_BUF_SIZE) {
-        if (ctx->item_str[idx] >= '0' && ctx->item_str[idx] <= '9') {
-            if (ret == 0) {
-                ret = (uint32_t)(ctx->item_str[idx] - '0');
-            } else {
-                ret = ret * 10 + ctx->item_str[idx];
-            }
-        } else {
-            return ret;
-        }
-        idx += 1;
+    if (ctx->item_str[ctx->item_pos - 1] >= '0' && ctx->item_str[ctx->item_pos - 1] <= '9') {
+        ret = ret * 10 + (uint32_t)(ctx->item_str[ctx->item_pos-1] - '0');
+    } else {
+        return ret;
     }
 
     return ret;
@@ -103,6 +95,10 @@ static void parse_time(on9_nmea_ctx_t *ctx)
 
 static void parse_date(on9_nmea_ctx_t *ctx)
 {
+    if (ctx->item_pos < 6) {
+        return;
+    }
+
     ctx->next_result.date.year = on9_two_char_to_u8(ctx->item_str);
     ctx->next_result.date.month = on9_two_char_to_u8(ctx->item_str + 2);
     ctx->next_result.date.day = on9_two_char_to_u8(ctx->item_str + 4);
@@ -119,7 +115,6 @@ static on9_nmea_state_t parse_type(on9_nmea_ctx_t *ctx)
             ctx->next_result.type[1] = 'M';
             ctx->next_result.type[2] = 'C';
             ctx->next_result.type[3] = '\0';
-            return ctx->curr_state;
             return ON9_NMEA_STATE_START_RMC;
         } else if (on9_strnstr(ctx->item_str, "GGA", ON9_ITEM_BUF_SIZE - 1) != NULL) {
             ctx->curr_state = ON9_NMEA_STATE_START_GGA;
@@ -129,13 +124,8 @@ static on9_nmea_state_t parse_type(on9_nmea_ctx_t *ctx)
             ctx->next_result.type[1] = 'G';
             ctx->next_result.type[2] = 'A';
             ctx->next_result.type[3] = '\0';
-            return ctx->curr_state;
-        } else {
-            ctx->item_pos += 1;
             return ON9_NMEA_STATE_START_GGA;
         }
-    } else {
-        ctx->item_pos += 1;
     }
 
     return ctx->curr_state;
@@ -143,27 +133,14 @@ static on9_nmea_state_t parse_type(on9_nmea_ctx_t *ctx)
 
 static void parse_on9_float(on9_nmea_ctx_t *ctx, on9_nmea_float_t *out)
 {
-    size_t idx = 0;
-    bool minor = false;
-    while (idx < ON9_ITEM_BUF_SIZE) {
-        if (ctx->item_str[idx] >= '0' && ctx->item_str[idx] <= '9') {
-            if (!minor) {
-                if (out->major == 0) {
-                    out->major = (int32_t)(ctx->item_str[idx] - '0');
-                } else {
-                    out->major = out->major * 10 + ctx->item_str[idx];
-                }
-            } else {
-                if (out->minor == 0) {
-                    out->minor = (int32_t)(ctx->item_str[idx] - '0');
-                } else {
-                    out->minor = out->major * 10 + ctx->item_str[idx];
-                }
-            }
-        } else if (ctx->item_str[idx] == '.') {
-            minor = true;
+    if (ctx->item_str[ctx->item_pos - 1] >= '0' && ctx->item_str[ctx->item_pos - 1] <= '9') {
+        if (ctx->float_parsing_minor) {
+            out->minor = out->minor * 10 + ctx->item_str[ctx->item_pos - 1] - '0';
+        } else {
+            out->major = out->major * 10 + ctx->item_str[ctx->item_pos - 1] - '0';
         }
-        idx += 1;
+    } else if (ctx->item_str[ctx->item_pos - 1] == '.') {
+        ctx->float_parsing_minor = true;
     }
 }
 
@@ -277,7 +254,7 @@ static on9_nmea_state_t parse_gga(on9_nmea_ctx_t *ctx)
         case 6: {
             size_t idx = (size_t)ctx->item_str[0] - '0';
             if (idx < sizeof(ON9_GGA_QUALITY_IND)) {
-                ctx->next_result.mode =  ON9_GGA_QUALITY_IND[idx];
+                ctx->next_result.mode = ON9_MAX(ON9_GGA_QUALITY_IND[idx], 9);
             }
 
             break;
@@ -349,6 +326,7 @@ on9_nmea_state_t on9_nmea_feed_char(on9_nmea_ctx_t *ctx, char next)
             ctx->curr_checksum ^= next;
             ctx->item_pos = 0;
             ctx->item_num += 1;
+            ctx->float_parsing_minor = false;
             memset(ctx->item_str, 0, ON9_ITEM_BUF_SIZE);
             break;
         }

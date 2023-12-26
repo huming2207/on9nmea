@@ -86,6 +86,7 @@ typedef struct on9_gnss_result {
 
 typedef struct on9_nmea_ctx {
     bool asterisk;
+    bool float_parsing_minor;
     uint8_t item_num;
     uint8_t item_pos;
     uint8_t curr_checksum;
