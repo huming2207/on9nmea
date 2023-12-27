@@ -2,7 +2,7 @@
 
 Dumb & tiny state machine based NMEA parser
 
-"[On 9](https://en.wiktionary.org/wiki/on9)" means "戆鸠" in Cantonese, means "dumb"
+"[On 9](https://en.wiktionary.org/wiki/on9)" is an informal abbreviation of "戆鸠" in Cantonese, which means "dumb"
 
 This library does NOT have any C standard library used. Only `size_t` and `uintXX_t` types used.
 
@@ -16,7 +16,7 @@ Currently, this library only supports RMC and GGA sentences.
 
 ## Size
 
-As of commit [99b8ee66eabf6](https://github.com/huming2207/on9nmea/tree/99b8ee66eabf6381f98a952cdfdd2ef94f613773):
+As of commit [99b8ee66eabf6](https://github.com/huming2207/on9nmea/tree/99b8ee66eabf6381f98a952cdfdd2ef94f613773), compiled with ESP-IDF v5.1.2 + esp-12.2.0_20230208 toolchain for ESP32-S3 in `-Os`:
 
 - `.text`
   - 1119 bytes
