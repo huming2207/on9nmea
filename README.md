@@ -23,3 +23,6 @@ As of commit [99b8ee66eabf6](https://github.com/huming2207/on9nmea/tree/99b8ee66
 - `.rodata`
   - 44 bytes
 
+## License
+
+MIT or Apache-2.0
