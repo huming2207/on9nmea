@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdint.h>
 #include "on9nmea.h"
 
 #define ON9_MAX(a,b) ((a) > (b) ? (a) : (b))
@@ -15,6 +16,16 @@ static const on9_nmea_mode_indicator_t ON9_GGA_QUALITY_IND[] = {
         ON9_NMEA_MODE_MANUAL_INPUT, // 7 is Manual
         ON9_NMEA_MODE_SIMULATE, // 8 is Simulation
 };
+
+static void on9_memset(void *ptr, uint8_t set, size_t len)
+{
+    size_t ctr = 0;
+    uint8_t *buf_ptr = ptr;
+    while (ctr < len) {
+        buf_ptr[ctr] = 0;
+        ctr += 1;
+    }
+}
 
 static char *on9_strnstr(const char *str, const char *substring, size_t str_len)
 {
@@ -303,7 +314,7 @@ void on9_nmea_init(on9_nmea_ctx_t *ctx)
         return;
     }
 
-    memset(ctx, 0, sizeof(on9_nmea_ctx_t));
+    on9_memset(ctx, 0, sizeof(on9_nmea_ctx_t));
 }
 
 on9_nmea_state_t on9_nmea_feed_char(on9_nmea_ctx_t *ctx, char next)
@@ -327,7 +338,7 @@ on9_nmea_state_t on9_nmea_feed_char(on9_nmea_ctx_t *ctx, char next)
             ctx->item_pos = 0;
             ctx->item_num += 1;
             ctx->float_parsing_minor = false;
-            memset(ctx->item_str, 0, ON9_ITEM_BUF_SIZE);
+            on9_memset(ctx->item_str, 0, ON9_ITEM_BUF_SIZE);
             break;
         }
 

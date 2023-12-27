@@ -1,10 +1,12 @@
 # On9 NMEA
 
-Dumb state machine based NMEA parser
+Dumb & tiny state machine based NMEA parser
 
 "On 9" means "戆鸠" in Cantonese, means "dumb"
 
-This library only uses `memset()`. No other C standard library calls, no heap allocation.
+This library does NOT have any C standard library used. Only `size_t` and `uintXX_t` types used.
+
+Currently, this library only supports RMC and GGA sentences.
 
 ## Usage
 
