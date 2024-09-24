@@ -110,9 +110,9 @@ static void parse_date(on9_nmea_ctx_t *ctx)
         return;
     }
 
-    ctx->next_result.date.year = on9_two_char_to_u8(ctx->item_str);
+    ctx->next_result.date.day = on9_two_char_to_u8(ctx->item_str);
     ctx->next_result.date.month = on9_two_char_to_u8(ctx->item_str + 2);
-    ctx->next_result.date.day = on9_two_char_to_u8(ctx->item_str + 4);
+    ctx->next_result.date.year = on9_two_char_to_u8(ctx->item_str + 4);
 }
 
 static on9_nmea_state_t parse_type(on9_nmea_ctx_t *ctx)
